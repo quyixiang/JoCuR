@@ -1,0 +1,14 @@
+Package: JoCuR
+Type: Package
+Title: Joint Cure Rate Model
+Version: 0.1.0
+Author: Yixiang Qu <yqu@unc.edu>
+Maintainer: Yixiang Qu <yqu@unc.edu>
+Description: Code for paper: Change-Point Detection Using a Cure Rate Joint Model for Longitudinal Tumor Burden and Time-to-Event Data
+License: MIT
+Encoding: UTF-8
+LazyData: false
+Imports: Rcpp (>= 0.11.0), RcppArmadillo (>= 0.9.850.1.0)
+LinkingTo: Rcpp, RcppArmadillo
+RoxygenNote: 7.3.2
+Depends: mvtnorm, survival, ks, psych, TruncatedNormal, randcorr, dplyr, Rlab
