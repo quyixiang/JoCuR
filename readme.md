@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**JoCuR** is an R package that implements a C++-accelerated joint cure rate model for longitudinal tumor burden and time-to-event data, as described in the paper *"Change-Point Detection Using a Cure Rate Joint Model for Longitudinal Tumor Burden and Time-to-Event Data"* by Yixiang Qu.
+**JoCuR** is an R package that implements a C++-accelerated joint cure rate model for longitudinal tumor burden and time-to-event data, as described in the paper *"Change-Point Detection Using a Cure Rate Joint Model for Longitudinal Tumor Burden and Time-to-Event Data"* by Yixiang Qu et al.
 
 - **Author**: Yixiang Qu (<yqu@unc.edu>)
 - **License**: MIT
@@ -26,11 +26,8 @@ devtools::install_github("quyixiang/JoCuR")
 
 ## Usage
 
-### Main Function: `infer_CRJoint_MLE`
 
-This function estimates the parameters of the joint cure rate model using the EM algorithm, accelerated by C++.
-
-#### Example
+### Data Simulation
 
 ```R
 # Load required library
@@ -39,10 +36,14 @@ library(JoCuR)
 # Set seed for reproducibility
 set.seed(123)
 
+# Define formulas
+fmla.tte <- as.formula(Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE)
+fmla.long <- as.formula(PCHG ~ 0 + Y0SCALE)
+
 # Simulate example data
 sim_data <- CRsimulation(
-  fmla.tte = as.formula(Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE),
-  fmla.long = as.formula(PCHG ~ 0 + Y0SCALE),
+  fmla.tte = fmla.tte,
+  fmla.long = fmla.long,
   beta.tte = c(0.2), normal.tte = TRUE, sd.tte = 0.2,
   beta.y = c(-0.5), sd.y = 0.1, beta.y.cure = c(-0.2), sd.y.cured = 0.2,
   cured.rate = 0.4, cured.mean = c(0, -0.2), cured.sd = c(0.2, 0.2),
@@ -59,10 +60,16 @@ sim_data <- CRsimulation(
 longdat <- sim_data[["longdat"]]
 survdat <- sim_data[["survdat"]]
 
-# Define formulas
-fmla.tte <- as.formula(Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE)
-fmla.long <- as.formula(PCHG ~ 0 + Y0SCALE)
+# At least these columns are required for model inference
+longdat.select <- longdat[, c("id", "Y0SCALE", "PFS_YEARS", "PFS_EVENT", "PCHG", "visittime")]
+survdat.select <- survdat[, c("id", "Y0SCALE", "PFS_YEARS", "PFS_EVENT")]
+```
 
+### Main Function: `infer_CRJoint_MLE`
+
+This function estimates the parameters of the joint cure rate model using the EM algorithm, accelerated by C++.
+
+```R
 # Initial values
 init <- list(
   mu_r = c(0.5, 0, -0.5, 0.5),
@@ -87,8 +94,8 @@ init <- list(
 
 # Fit the joint model
 results <- infer_CRJoint_MLE(
-  survdat = survdat,
-  longdat = longdat,
+  survdat = survdat.select,
+  longdat = longdat.select,
   init = init,
   fmla.tte = fmla.tte,
   fmla.long = fmla.long,
@@ -99,6 +106,7 @@ results <- infer_CRJoint_MLE(
   no_cure = FALSE
 )
 ```
+
 
 ### Additional Function: `E_y`
 
