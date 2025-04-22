@@ -12,6 +12,7 @@
 #' @param maxIter An integer specifying the maximum number of iterations for the EM algorithm.
 #' @param tol A numeric value specifying the convergence tolerance for the EM algorithm.
 #' @param no_cure A logical value indicating whether to include the cure rate model.
+#' @param bounded_slope A logical value indicating whether to use bounded slopes for the longitudinal outcome.
 #' @return A list containing the estimated parameters of the joint cure rate model.
 #' @examples
 #'   # Load required library
@@ -79,7 +80,7 @@
 #'     tol = 5e-3,
 #'     no_cure = FALSE
 #'   )
-infer_CRJoint_MLE <- function(survdat, longdat, init, fmla.tte, fmla.long, longdat.time, id.indicator, maxIter = 5000, tol = 8e-4, no_cure = FALSE) {
+infer_CRJoint_MLE <- function(survdat, longdat, init, fmla.tte, fmla.long, longdat.time, id.indicator, maxIter = 5000, tol = 8e-4, no_cure = FALSE, bounded_slope = FALSE) {
   data.list <- load_onearm_data(
     survdat = survdat,
     longdat = longdat,
@@ -94,7 +95,7 @@ infer_CRJoint_MLE <- function(survdat, longdat, init, fmla.tte, fmla.long, longd
   data.list[["tobs"]] <- log(data.list[["tobs"]])
 
 
-  cure_res <- MCEM_cureJoint(data.list, initial = init, maxIter = maxIter, tol = tol, no_cure = no_cure)
+  cure_res <- MCEM_cureJoint(data.list, initial = init, maxIter = maxIter, tol = tol, no_cure = no_cure, bounded_slope = bounded_slope)
 }
 
 #' @title E_y

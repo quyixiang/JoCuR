@@ -1,4 +1,4 @@
-MCEM_cureJoint <- function(data.list, tol = 1e-6, maxIter = 1000, initial = NULL, gamma = 0.0001, no_cure = FALSE) {
+MCEM_cureJoint <- function(data.list, tol = 1e-6, maxIter = 1000, initial = NULL, gamma = 0.0001, no_cure = FALSE, bounded_slope = FALSE) {
   nobs <- data.list[["nobs"]]
   ncen <- data.list[["ncen"]]
   visittime_obs <- data.list[["visitobs"]]
@@ -144,23 +144,44 @@ MCEM_cureJoint <- function(data.list, tol = 1e-6, maxIter = 1000, initial = NULL
       beta_tte = beta_tte, sigma_tte_sq = sigma_tte_sq, Sigma_r = Sigma_r, beta_y = beta_y, sigma_y_sq = sigma_y_sq, E_Delta_cen = E_Delta_cen
     )
 
-    mu_r_new <- mu_r
-    tryCatch(
-      {
-        mu_optim <- optim(
-          par = mu_r, fn = wrapped_Q_function, gr = wrapped_gradient_function,
-          lower = c(0, -Inf, -Inf, -Inf), method = "L-BFGS-B", control = list(fnscale = -1),
-          Nobs = Nobs, nobs = nobs, E_r_obs = E_r_obs, E_r_rT_obs = E_r_rT_obs, Estep_2_obs = Estep_2_obs, yobs = yobs, Xobs = Xobs, Xtte_obs = Xtte_obs,
-          visittime_obs = visittime_obs, tobs = tobs, new_id_obs = new_id_obs,
-          Ncen = Ncen, ncen = ncen, E_r_cen = E_r_cen, E_r_rT_cen = E_r_rT_cen, Estep_2_cen = Estep_2_cen, ycen = ycen, Xcen = Xcen, Xtte_cen = Xtte_cen,
-          visittime_cen = visittime_cen, E_ti = E_t_cen, E_ti_sq = E_t_sq_cen, E_g0_ti = E_g0_t_cen, E_g1_ti = E_g1_t_cen, E_g2_ti = E_g2_t_cen, new_id_cen = new_id_cen,
-          beta_tte = beta_tte, sigma_tte_sq = sigma_tte_sq, Sigma_r = Sigma_r, beta_y = beta_y, sigma_y_sq = sigma_y_sq, E_Delta_cen = E_Delta_cen
-        )
-        mu_r_new <- mu_optim$par
-      },
-      error = function(e) {
-      }
-    )
+    if (!(bounded_slope)) {
+      mu_r_new <- mu_r
+      tryCatch(
+        {
+          mu_optim <- optim(
+            par = mu_r, fn = wrapped_Q_function, gr = wrapped_gradient_function,
+            lower = c(0, -Inf, -Inf, -Inf), method = "L-BFGS-B", control = list(fnscale = -1),
+            Nobs = Nobs, nobs = nobs, E_r_obs = E_r_obs, E_r_rT_obs = E_r_rT_obs, Estep_2_obs = Estep_2_obs, yobs = yobs, Xobs = Xobs, Xtte_obs = Xtte_obs,
+            visittime_obs = visittime_obs, tobs = tobs, new_id_obs = new_id_obs,
+            Ncen = Ncen, ncen = ncen, E_r_cen = E_r_cen, E_r_rT_cen = E_r_rT_cen, Estep_2_cen = Estep_2_cen, ycen = ycen, Xcen = Xcen, Xtte_cen = Xtte_cen,
+            visittime_cen = visittime_cen, E_ti = E_t_cen, E_ti_sq = E_t_sq_cen, E_g0_ti = E_g0_t_cen, E_g1_ti = E_g1_t_cen, E_g2_ti = E_g2_t_cen, new_id_cen = new_id_cen,
+            beta_tte = beta_tte, sigma_tte_sq = sigma_tte_sq, Sigma_r = Sigma_r, beta_y = beta_y, sigma_y_sq = sigma_y_sq, E_Delta_cen = E_Delta_cen
+          )
+          mu_r_new <- mu_optim$par
+        },
+        error = function(e) {
+        }
+      )
+    } else {
+      mu_r_new <- mu_r
+      tryCatch(
+        {
+          mu_optim <- optim(
+            par = mu_r, fn = wrapped_Q_function, gr = wrapped_gradient_function,
+            lower = c(0, -Inf, -Inf, 0), upper = c(Inf, Inf, 0, Inf),
+            method = "L-BFGS-B", control = list(fnscale = -1),
+            Nobs = Nobs, nobs = nobs, E_r_obs = E_r_obs, E_r_rT_obs = E_r_rT_obs, Estep_2_obs = Estep_2_obs, yobs = yobs, Xobs = Xobs, Xtte_obs = Xtte_obs,
+            visittime_obs = visittime_obs, tobs = tobs, new_id_obs = new_id_obs,
+            Ncen = Ncen, ncen = ncen, E_r_cen = E_r_cen, E_r_rT_cen = E_r_rT_cen, Estep_2_cen = Estep_2_cen, ycen = ycen, Xcen = Xcen, Xtte_cen = Xtte_cen,
+            visittime_cen = visittime_cen, E_ti = E_t_cen, E_ti_sq = E_t_sq_cen, E_g0_ti = E_g0_t_cen, E_g1_ti = E_g1_t_cen, E_g2_ti = E_g2_t_cen, new_id_cen = new_id_cen,
+            beta_tte = beta_tte, sigma_tte_sq = sigma_tte_sq, Sigma_r = Sigma_r, beta_y = beta_y, sigma_y_sq = sigma_y_sq, E_Delta_cen = E_Delta_cen
+          )
+          mu_r_new <- mu_optim$par
+        },
+        error = function(e) {
+        }
+      )
+    }
 
     vechP_new <- vechP
     Sigma_r_new <- vechP2Sigma(vechP)
