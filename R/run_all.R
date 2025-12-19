@@ -98,6 +98,39 @@ infer_CRJoint_MLE <- function(survdat, longdat, init, fmla.tte, fmla.long, longd
   cure_res <- MCEM_cureJoint(data.list, initial = init, maxIter = maxIter, tol = tol, no_cure = no_cure, bounded_slope = bounded_slope)
 }
 
+infer_CRJoint_MLE_std <- function(survdat, longdat, init, fmla.tte, fmla.long, longdat.time, id.indicator, maxIter = 5000, tol = 8e-4, no_cure = FALSE, bounded_slope = FALSE) {
+  
+  data.list <- load_onearm_data(
+    survdat = survdat,
+    longdat = longdat,
+    fmla.tte = fmla.tte,
+    fmla.long = fmla.long,
+    longdat.time = longdat.time,
+    id.indicator = id.indicator
+  )
+
+  data.list[["tcen"]] <- log(data.list[["tcen"]])
+  data.list[["tobs"]] <- log(data.list[["tobs"]])
+
+
+  Xobs <- data.list[["Xlong_obs"]]
+  visitobs <- data.list[["visitobs"]]
+  
+  Xcen <- data.list[["Xlong_cen"]]
+  visitcen <- data.list[["visitcen"]]
+  
+
+  Xlong_aug_obs <- cbind(Xobs, Intercept = 1, Time = visitobs)
+  Xlong_aug_cen <- cbind(Xcen, Intercept = 1, Time = visitcen)
+  
+  data.list[["Xlong_aug_obs"]] <- Xlong_aug_obs
+  data.list[["Xlong_aug_cen"]] <- Xlong_aug_cen
+
+  cure_res <- MCEM_cureJoint_std(data.list, initial = init, maxIter = maxIter, tol = tol, no_cure = no_cure, bounded_slope = bounded_slope)
+  
+  return(cure_res)
+}
+
 #' @title E_y
 #' @description This function calculates the expected value of the longitudinal outcome given the cure rate model parameters for a new time point.
 #' @param X A vector of covariates for the longitudinal outcome.

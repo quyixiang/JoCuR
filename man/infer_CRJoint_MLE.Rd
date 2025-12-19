@@ -14,7 +14,8 @@ infer_CRJoint_MLE(
   id.indicator,
   maxIter = 5000,
   tol = 8e-04,
-  no_cure = FALSE
+  no_cure = FALSE,
+  bounded_slope = FALSE
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ infer_CRJoint_MLE(
 \item{tol}{A numeric value specifying the convergence tolerance for the EM algorithm.}
 
 \item{no_cure}{A logical value indicating whether to include the cure rate model.}
+
+\item{bounded_slope}{A logical value indicating whether to use bounded slopes for the longitudinal outcome.}
 }
 \value{
 A list containing the estimated parameters of the joint cure rate model.
