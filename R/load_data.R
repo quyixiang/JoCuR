@@ -8,9 +8,6 @@ load_onearm_data <- function(
     chgpt_location = 0.5, b0_location = 0, b1_location = -0.5, b2_location = 0.5,
     chgpt_scale = 0.5, b0_scale = 1, b1_scale = 0.5, b2_scale = 0.5,
     chgpt_shape = 8, b0_shape = 8, b1_shape = 8, b2_shape = 8) {
-  library(data.table)
-  library(dplyr)
-
   # check if survdat and longdat have same "id"
   if (!(id.indicator %in% colnames(survdat) && id.indicator %in% colnames(longdat))) {
     print("The id indicator is not found in one of the datasets.")

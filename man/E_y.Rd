@@ -24,8 +24,10 @@ The expected value of the longitudinal outcome given the cure rate model paramet
 This function calculates the expected value of the longitudinal outcome given the cure rate model parameters for a new time point.
 }
 \examples{
+\dontrun{
  # Make sure that you have run the examples from infer_CRJoint_MLE
  X_bar <- mean(survdat$Y0SCALE)
  W_bar <- mean(survdat$Y0SCALE)
  E_y(X_bar, W_bar, results, 0.1, 100)
+}
 }

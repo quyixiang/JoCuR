@@ -15,7 +15,8 @@ infer_CRJoint_MLE(
   maxIter = 5000,
   tol = 8e-04,
   no_cure = FALSE,
-  bounded_slope = FALSE
+  bounded_slope = FALSE,
+  non_std = 0
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ infer_CRJoint_MLE(
 \item{no_cure}{A logical value indicating whether to include the cure rate model.}
 
 \item{bounded_slope}{A logical value indicating whether to use bounded slopes for the longitudinal outcome.}
+
+\item{non_std}{Integer flag for legacy path: use \code{0} (default) for standardized identifiable implementation, and \code{1} for original non-standard implementation.}
 }
 \value{
 A list containing the estimated parameters of the joint cure rate model.
