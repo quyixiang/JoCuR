@@ -10,8 +10,8 @@ Description: Implements a joint cure rate model for longitudinal tumor burden
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
-Imports: Rcpp (>= 0.11.0), RcppArmadillo (>= 0.9.850.1.0), dplyr,
-	mvtnorm, psych, randcorr, Rlab, rlang, survival, TruncatedNormal
+Imports: Rcpp (>= 0.11.0), dplyr,
+	mvtnorm, randcorr, Rlab, rlang, TruncatedNormal
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 Suggests: testthat (>= 3.0.0)

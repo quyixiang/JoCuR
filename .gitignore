@@ -7,3 +7,5 @@ src/*.so
 src/*.dll
 src/symbols.rds
 ..Rcheck/
+JoCuR.Rcheck/
+*.tar.gz

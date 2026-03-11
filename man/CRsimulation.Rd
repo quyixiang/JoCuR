@@ -91,10 +91,6 @@ The generate_simulation_data function provides a convenient way to produce simul
 tailored for both time-to-event and longitudinal data analyses. This can be particularly useful for methodological studies,
 preliminary analyses, and educational purposes.
 }
-\section{Parameters}{
-
-}
-
 \section{Returns}{
 
 The function returns a list comprising three elements:

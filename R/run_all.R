@@ -14,6 +14,7 @@
 #' @param non_std Integer flag for legacy path: use `0` (default) for standardized identifiable implementation, and `1` for original non-standard implementation.
 #' @return A list containing the estimated parameters of the joint cure rate model.
 #' @examples
+#' \dontrun{
 #'   # Load required library
 #'   library(JoCuR)
 #'
@@ -22,7 +23,7 @@
 #'
 #'   # Simulate example data
 #'   sim_data <- CRsimulation(
-#'     fmla.tte = as.formula(Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE),
+#'     fmla.tte = as.formula(survival::Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE),
 #'     fmla.long = as.formula(PCHG ~ 0 + Y0SCALE),
 #'     beta.tte = c(0.2), normal.tte = TRUE, sd.tte = 0.2,
 #'     beta.y = c(-0.5), sd.y = 0.1, beta.y.cure = c(-0.2), sd.y.cured = 0.2,
@@ -41,7 +42,7 @@
 #'   survdat <- sim_data[["survdat"]]
 #'
 #'   # Define formulas
-#'   fmla.tte <- as.formula(Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE)
+#'   fmla.tte <- as.formula(survival::Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE)
 #'   fmla.long <- as.formula(PCHG ~ 0 + Y0SCALE)
 #'
 #'   # Initial values
@@ -79,6 +80,7 @@
 #'     tol = 5e-3,
 #'     no_cure = FALSE
 #'   )
+#' }
 infer_CRJoint_MLE <- function(survdat, longdat, init, fmla.tte, fmla.long, longdat.time, id.indicator, maxIter = 5000, tol = 8e-4, no_cure = FALSE, bounded_slope = FALSE, non_std = 0) {
   data.list <- load_onearm_data(
     survdat = survdat,

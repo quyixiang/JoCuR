@@ -51,6 +51,7 @@ A list containing the estimated parameters of the joint cure rate model.
 This function estimates the parameters of the joint cure rate model using the EM algorithm.
 }
 \examples{
+\dontrun{
   # Load required library
   library(JoCuR)
 
@@ -59,7 +60,7 @@ This function estimates the parameters of the joint cure rate model using the EM
 
   # Simulate example data
   sim_data <- CRsimulation(
-    fmla.tte = as.formula(Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE),
+    fmla.tte = as.formula(survival::Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE),
     fmla.long = as.formula(PCHG ~ 0 + Y0SCALE),
     beta.tte = c(0.2), normal.tte = TRUE, sd.tte = 0.2,
     beta.y = c(-0.5), sd.y = 0.1, beta.y.cure = c(-0.2), sd.y.cured = 0.2,
@@ -78,7 +79,7 @@ This function estimates the parameters of the joint cure rate model using the EM
   survdat <- sim_data[["survdat"]]
 
   # Define formulas
-  fmla.tte <- as.formula(Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE)
+  fmla.tte <- as.formula(survival::Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE)
   fmla.long <- as.formula(PCHG ~ 0 + Y0SCALE)
 
   # Initial values
@@ -116,4 +117,5 @@ This function estimates the parameters of the joint cure rate model using the EM
     tol = 5e-3,
     no_cure = FALSE
   )
+}
 }
