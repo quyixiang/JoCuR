@@ -115,7 +115,7 @@ ey_t05
 
 If this package supports your work, please cite:
 
-Qu Y, et al. *Change-Point Detection Using a Cure Rate Joint Model for Longitudinal Tumor Burden and Time-to-Event Data*.
+Qu Y, et al. *Cure Rate Joint Model for Time-to-Event Data and Longitudinal Tumor Burden with Potential Change Points*.
 
 ## Author
 

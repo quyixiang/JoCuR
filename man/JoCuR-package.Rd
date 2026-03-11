@@ -29,8 +29,8 @@ Yixiang Qu
 Maintainer: Yixiang Qu <yqu@unc.edu>
 }
 \references{
-  Qu Y, et al. Change-Point Detection Using a Cure Rate Joint Model for
-  Longitudinal Tumor Burden and Time-to-Event Data.
+  Qu Y, et al. Cure Rate Joint Model for Time-to-Event Data and
+  Longitudinal Tumor Burden with Potential Change Points.
 }
 \keyword{ package }
 \seealso{
