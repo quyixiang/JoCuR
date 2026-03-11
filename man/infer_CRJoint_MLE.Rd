@@ -14,7 +14,9 @@ infer_CRJoint_MLE(
   id.indicator,
   maxIter = 5000,
   tol = 8e-04,
-  no_cure = FALSE
+  no_cure = FALSE,
+  bounded_slope = FALSE,
+  non_std = 0
 )
 }
 \arguments{
@@ -37,6 +39,10 @@ infer_CRJoint_MLE(
 \item{tol}{A numeric value specifying the convergence tolerance for the EM algorithm.}
 
 \item{no_cure}{A logical value indicating whether to include the cure rate model.}
+
+\item{bounded_slope}{A logical value indicating whether to use bounded slopes for the longitudinal outcome.}
+
+\item{non_std}{Integer flag for legacy path: use \code{0} (default) for standardized identifiable implementation, and \code{1} for original non-standard implementation.}
 }
 \value{
 A list containing the estimated parameters of the joint cure rate model.
@@ -45,6 +51,7 @@ A list containing the estimated parameters of the joint cure rate model.
 This function estimates the parameters of the joint cure rate model using the EM algorithm.
 }
 \examples{
+\dontrun{
   # Load required library
   library(JoCuR)
 
@@ -53,7 +60,7 @@ This function estimates the parameters of the joint cure rate model using the EM
 
   # Simulate example data
   sim_data <- CRsimulation(
-    fmla.tte = as.formula(Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE),
+    fmla.tte = as.formula(survival::Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE),
     fmla.long = as.formula(PCHG ~ 0 + Y0SCALE),
     beta.tte = c(0.2), normal.tte = TRUE, sd.tte = 0.2,
     beta.y = c(-0.5), sd.y = 0.1, beta.y.cure = c(-0.2), sd.y.cured = 0.2,
@@ -72,7 +79,7 @@ This function estimates the parameters of the joint cure rate model using the EM
   survdat <- sim_data[["survdat"]]
 
   # Define formulas
-  fmla.tte <- as.formula(Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE)
+  fmla.tte <- as.formula(survival::Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE)
   fmla.long <- as.formula(PCHG ~ 0 + Y0SCALE)
 
   # Initial values
@@ -110,4 +117,5 @@ This function estimates the parameters of the joint cure rate model using the EM
     tol = 5e-3,
     no_cure = FALSE
   )
+}
 }

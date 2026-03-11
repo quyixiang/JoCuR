@@ -1,3 +1,18 @@
+vech <- function(mat) {
+  mat[lower.tri(mat, diag = TRUE)]
+}
+
+invvech <- function(x) {
+  n <- floor((sqrt(8 * length(x) + 1) - 1) / 2)
+  mat <- matrix(0, n, n)
+  mat[lower.tri(mat, diag = TRUE)] <- x
+  mat
+}
+
+tr <- function(mat) {
+  sum(diag(mat))
+}
+
 Sigma2P <- function(Sigma) {
   Q <- t(chol(Sigma))
   P <- Q

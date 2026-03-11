@@ -1,2 +1,13 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.git$
+^\.gitignore$
+^\.Rhistory$
+^\.RData$
+^\.Ruserdata$
+^\.DS_Store$
+^\.\.Rcheck$
+^\.\.Rcheck/.*$
+^output_1219$
+^output_1219/.*$
+^Response to Comments\.md$

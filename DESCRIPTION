@@ -4,11 +4,15 @@ Title: Joint Cure Rate Model
 Version: 0.1.0
 Author: Yixiang Qu <yqu@unc.edu>
 Maintainer: Yixiang Qu <yqu@unc.edu>
-Description: Code for paper: Change-Point Detection Using a Cure Rate Joint Model for Longitudinal Tumor Burden and Time-to-Event Data
-License: MIT
+Description: Implements a joint cure rate model for longitudinal tumor burden
+	and time-to-event outcomes with Monte Carlo EM estimation and
+	C++ acceleration.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
-Imports: Rcpp (>= 0.11.0), RcppArmadillo (>= 0.9.850.1.0)
+Imports: Rcpp (>= 0.11.0), dplyr,
+	mvtnorm, randcorr, Rlab, rlang, TruncatedNormal
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
-Depends: mvtnorm, survival, ks, psych, TruncatedNormal, randcorr, dplyr, Rlab
+Suggests: testthat (>= 3.0.0)
+Config/testthat/edition: 3

@@ -58,11 +58,23 @@ CRsimulation(
 
 \item{sd.y}{A single numeric value, representing the standard deviation of the Y variable in the longitudinal data model.}
 
+\item{beta.y.cure}{A numeric vector that defines the coefficients for the cured-group longitudinal mean structure.}
+
+\item{sd.y.cured}{A single numeric value representing the residual standard deviation in the cured group longitudinal model.}
+
 \item{randeff.mean}{A numeric vector that defines the average of the random effects.}
 
 \item{randeff.sd}{A numeric vector that designates the standard deviations associated with the random effects.}
 
 \item{randeff.corr}{A matrix that sets the correlation structure of the random effects. If NULL, a random structure will be generated.}
+
+\item{cured.rate}{A numeric value specifying the proportion of cured subjects in the simulated data.}
+
+\item{cured.mean}{A numeric vector for the cured-group random-effects mean.}
+
+\item{cured.sd}{A numeric vector for the cured-group random-effects standard deviations.}
+
+\item{cured.corr}{A matrix for the cured-group random-effects correlation structure. If NULL, a random correlation matrix is generated.}
 
 \item{n}{An integer that represents the number of observations to simulate.}
 
@@ -79,10 +91,6 @@ The generate_simulation_data function provides a convenient way to produce simul
 tailored for both time-to-event and longitudinal data analyses. This can be particularly useful for methodological studies,
 preliminary analyses, and educational purposes.
 }
-\section{Parameters}{
-
-}
-
 \section{Returns}{
 
 The function returns a list comprising three elements:

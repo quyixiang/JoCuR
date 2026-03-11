@@ -1,101 +1,79 @@
-# JoCuR: Joint Cure Rate Model
+# JoCuR
 
+> **Joint Cure Rate modeling for longitudinal tumor burden and time-to-event outcomes**
+
+[![R](https://img.shields.io/badge/R-%3E%3D4.3-276DC3)](https://www.r-project.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Status](https://img.shields.io/badge/status-research%20ready-brightgreen)]()
 
-**JoCuR** is an R package that implements a C++-accelerated joint cure rate model for longitudinal tumor burden and time-to-event data, as described in the paper *"Change-Point Detection Using a Cure Rate Joint Model for Longitudinal Tumor Burden and Time-to-Event Data"* by Yixiang Qu et al.
+`JoCuR` implements a C++-accelerated joint cure rate framework for oncology-style data, where tumor burden trajectories and progression times are modeled together under latent subgroup structure.
 
-- **Author**: Yixiang Qu (<yqu@unc.edu>)
-- **License**: MIT
+## Why JoCuR?
 
-## Description
+Many oncology longitudinal profiles are **not purely linear**:
 
-The `JoCuR` package implements a C++-accelerated joint cure rate model for analyzing longitudinal tumor burden (TB) and time-to-event data, as presented in the paper *"Change-Point Detection Using a Cure Rate Joint Model for Longitudinal Tumor Burden and Time-to-Event Data: A Case Study in Modeling Tumor Dynamics in NSCLC Clinical Trial"* by Qu et al. Tailored for oncology clinical trials, such as those in non-small cell lung cancer (NSCLC), this package addresses the dynamic patterns of TB, a critical biomarker reflecting treatment effects. It distinguishes between two patient groups: a "change-point group," where TB initially decreases and later increases (indicating disease progression), and a "stable group," where TB exhibits a sustained decline, potentially representing a cured subset. Leveraging the Monte Carlo Expectation-Maximization (MCEM) algorithm with C++ acceleration, the package efficiently estimates model parameters while incorporating time-to-event data to constrain individual-specific change points in the change-point group, even under censoring. Key functions include `infer_CRJoint_MLE` for parameter estimation and `E_y` for computing expected longitudinal TB trajectories. This flexible and robust framework outperforms traditional models by capturing heterogeneous TB dynamics and providing reliable marginal TB estimates, making it a valuable tool for assessing treatment efficacy in clinical research. The paper link will be available soon.
+- some patients show **change-point dynamics** (decrease then regrowth),
+- others remain **stable/long-term controlled**,
+- censoring and event timing carry critical information about latent trajectory shape.
+
+`JoCuR` is designed exactly for this setting.
+
+## Key Features
+
+- ⚡ **C++-accelerated MCEM** estimation for practical runtime.
+- 🧠 **Joint modeling** of longitudinal outcome + time-to-event.
+- 🎯 **Cure/stable subgroup modeling** with latent membership.
+- 🧪 **Built-in simulation** for benchmarking and method studies.
+- 🔁 **Two inference paths** via `non_std`:
+  - `non_std = 0` (default): standardized identifiable implementation,
+  - `non_std = 1`: legacy non-standard path.
 
 ## Installation
 
-To install the `JoCuR` package from GitHub, use the following commands in R:
-
-```R
-# Install devtools if not already installed
-if (!require("devtools")) install.packages("devtools")
-
-# Install JoCuR from GitHub (replace with your repository URL)
+```r
+if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
 devtools::install_github("quyixiang/JoCuR")
 ```
 
+## Quick Start
 
-## Usage
-
-
-### Data Simulation
-
-```R
-# Load required library
+```r
 library(JoCuR)
 
-# Set seed for reproducibility
 set.seed(123)
-
-# Define formulas
-fmla.tte <- as.formula(Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE)
+fmla.tte  <- as.formula(survival::Surv(PFS_YEARS, PFS_EVENT) ~ 0 + Y0SCALE)
 fmla.long <- as.formula(PCHG ~ 0 + Y0SCALE)
 
-# Simulate example data
 sim_data <- CRsimulation(
   fmla.tte = fmla.tte,
   fmla.long = fmla.long,
   beta.tte = c(0.2), normal.tte = TRUE, sd.tte = 0.2,
-  beta.y = c(-0.5), sd.y = 0.1, beta.y.cure = c(-0.2), sd.y.cured = 0.2,
-  cured.rate = 0.4, cured.mean = c(0, -0.2), cured.sd = c(0.2, 0.2),
-  cured.corr = matrix(c(1, 0.5, 0.5, 1), nrow = 2),
-  randeff.mean = c(0.5, 0, -0.5, 0.5), randeff.sd = rep(0.2, 4),
-  randeff.corr = matrix(c(1, -0.4, -0.2, -0.3,
-                          -0.4, 1, 0.5, 0.20,
-                          -0.2, 0.5, 1, 0.2,
-                          -0.3, 0.20, 0.2, 1), nrow = 4),
-  n = 100, censor.parameter = 0.5, time.interval = 0.1
+  beta.y = c(-0.5), sd.y = 0.1,
+  beta.y.cure = c(-0.2), sd.y.cured = 0.2,
+  cured.rate = 0.4,
+  n = 100,
+  censor.parameter = 0.5,
+  time.interval = 0.1
 )
 
-# Extract datasets
-longdat <- sim_data[["longdat"]]
 survdat <- sim_data[["survdat"]]
+longdat <- sim_data[["longdat"]]
 
-# At least these columns are required for model inference
-longdat.select <- longdat[, c("id", "Y0SCALE", "PFS_YEARS", "PFS_EVENT", "PCHG", "visittime")]
-survdat.select <- survdat[, c("id", "Y0SCALE", "PFS_YEARS", "PFS_EVENT")]
-```
-
-### Main Function: `infer_CRJoint_MLE`
-
-This function estimates the parameters of the joint cure rate model using the EM algorithm, accelerated by C++.
-
-```R
-# Initial values
 init <- list(
   mu_r = c(0.5, 0, -0.5, 0.5),
-  Sigma_r = diag(rep(0.2, 4)) %*% 
-            matrix(c(1, -0.4, -0.2, -0.3,
-                     -0.4, 1, 0.5, 0.20,
-                     -0.2, 0.5, 1, 0.2,
-                     -0.3, 0.20, 0.2, 1), nrow = 4) %*% 
-            diag(rep(0.2, 4)),
-  beta_y = c(-0.5),
-  sigma_y_sq = 0.01,
-  beta_tte = c(0.2),
-  sigma_tte_sq = 0.04,
+  Sigma_r = diag(rep(0.2, 4)),
+  beta_y = c(-0.5), sigma_y_sq = 0.01,
+  beta_tte = c(0.2), sigma_tte_sq = 0.04,
   pi_c = 0.4,
   beta_cure = c(-0.2),
   mu_r_cure = c(0, -0.2),
-  Sigma_r_cure = diag(c(0.2, 0.2)) %*% 
-                 matrix(c(1, 0.5, 0.5, 1), nrow = 2) %*% 
-                 diag(c(0.2, 0.2)),
+  Sigma_r_cure = diag(c(0.2, 0.2)),
   sigma_y_cure_sq = 0.04
 )
 
-# Fit the joint model
-results <- infer_CRJoint_MLE(
-  survdat = survdat.select,
-  longdat = longdat.select,
+fit <- infer_CRJoint_MLE(
+  survdat = survdat,
+  longdat = longdat,
   init = init,
   fmla.tte = fmla.tte,
   fmla.long = fmla.long,
@@ -103,21 +81,43 @@ results <- infer_CRJoint_MLE(
   id.indicator = "id",
   maxIter = 50,
   tol = 5e-3,
-  no_cure = FALSE
+  non_std = 0
 )
+
+ey_t05 <- E_y(
+  X = survdat$Y0SCALE,
+  W = survdat$Y0SCALE,
+  cure_res = fit,
+  t_new = 0.5,
+  J = 100
+)
+
+ey_t05
 ```
 
+## Main API
 
-### Additional Function: `E_y`
+- `CRsimulation(...)`  
+  Generate simulation datasets (`survdat`, `longdat`) with cure/stable structure.
 
-This function calculates the expected value of the longitudinal outcome at a new time point based on the fitted model.
+- `infer_CRJoint_MLE(...)`  
+  Fit the joint cure rate model and return estimated parameters.
 
-#### Example
+- `E_y(X, W, cure_res, t_new, J)`  
+  Estimate expected longitudinal outcome at a chosen time point.
 
-```R
-# Assuming 'results' is from the previous example
-X_bar <- mean(survdat$Y0SCALE)
-W_bar <- mean(survdat$Y0SCALE)
-expected_value <- E_y(X_bar, W_bar, results, t_new = 0.1, J = 100)
-print(expected_value)
-```
+## Project Status
+
+- Package checks pass locally via `R CMD build` and `R CMD check`.
+- Suitable for research workflows and method development.
+
+## Citation
+
+If this package supports your work, please cite:
+
+Qu Y, et al. *Change-Point Detection Using a Cure Rate Joint Model for Longitudinal Tumor Burden and Time-to-Event Data*.
+
+## Author
+
+**Yixiang Qu**  
+Email: `yqu@unc.edu`
